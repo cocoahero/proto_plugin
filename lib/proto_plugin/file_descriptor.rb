@@ -82,7 +82,7 @@ module ProtoPlugin
     #   Google::Protobuf::DescriptorProto#service
     def services
       @services ||= @descriptor.service.map do |s|
-        ServiceDescriptor.new(s, self)
+        ServiceDescriptor.new(s, self, @context)
       end
     end
   end

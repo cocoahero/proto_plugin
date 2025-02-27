@@ -5,37 +5,18 @@ require "test_helper"
 module ProtoPlugin
   class EnumDescriptorTest < Minitest::Test
     def setup
-      @file = FileDescriptor.new(
-        Google::Protobuf::FileDescriptorProto.new(
-          package: "my.package.name",
-          message_type: [
-            Google::Protobuf::DescriptorProto.new(
-              name: "RootMessage",
-              enum_type: [
-                Google::Protobuf::EnumDescriptorProto.new(
-                  name: "ChildEnumOne",
-                ),
-              ],
-            ),
-          ],
-          enum_type: [
-            Google::Protobuf::EnumDescriptorProto.new(
-              name: "RootEnum",
-            ),
-          ],
-        ),
-      )
-
-      @enum = @file.enums.first
+      @context = Context.new(request: load_request_fixture)
+      @article = @context.type_by_proto_name(".proto_plugin.fixtures.Article")
+      @category = @context.type_by_proto_name(".proto_plugin.fixtures.Category")
     end
 
     def test_full_name_of_file_enum
-      assert_equal("My::Package::Name::RootEnum", @enum.full_name)
+      assert_equal("ProtoPlugin::Fixtures::Category", @category.full_name)
     end
 
     def test_full_name_of_message_enum
-      enum = @file.messages.first.enums.first
-      assert_equal("My::Package::Name::RootMessage::ChildEnumOne", enum.full_name)
+      enum = @article.enums.first
+      assert_equal("ProtoPlugin::Fixtures::Article::Status", enum.full_name)
     end
   end
 end

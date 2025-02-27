@@ -20,10 +20,26 @@ module ProtoPlugin
 
     # @param descriptor [Google::Protobuf::MethodDescriptorProto]
     # @param service [ServiceDescriptor] The service this method was defined in.
-    def initialize(descriptor, service)
+    # @param context [Context]
+    def initialize(descriptor, service, context)
       super(descriptor)
       @descriptor = descriptor
       @service = service
+      @context = context
+    end
+
+    # Returns the `MessageDescriptor` of the method's input type.
+    #
+    # @return [MessageDescriptor]
+    def input
+      @context.type_by_proto_name(input_type)
+    end
+
+    # Returns the `MessageDescriptor` of the method's output type.
+    #
+    # @return [MessageDescriptor]
+    def output
+      @context.type_by_proto_name(output_type)
     end
 
     # Returns true if the client may stream multiple client messages.

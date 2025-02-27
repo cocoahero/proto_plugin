@@ -20,10 +20,12 @@ module ProtoPlugin
 
     # @param descriptor [Google::Protobuf::ServiceDescriptorProto]
     # @param parent [FileDescriptor] The file this service was defined within.
-    def initialize(descriptor, parent)
+    # @param context [Context]
+    def initialize(descriptor, parent, context)
       super(descriptor)
       @descriptor = descriptor
       @parent = parent
+      @context = context
     end
 
     # The full name of the service, including parent namespace.
@@ -46,7 +48,7 @@ module ProtoPlugin
     #   Google::Protobuf::ServiceDescriptorProto#method
     def rpc_methods
       @rpc_methods ||= @descriptor["method"].map do |m|
-        MethodDescriptor.new(m, self)
+        MethodDescriptor.new(m, self, @context)
       end
     end
   end
