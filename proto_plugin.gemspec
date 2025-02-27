@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.email = ["jonathan@jmb.dev"]
   spec.license = "MIT"
 
-  spec.required_ruby_version = "~> 3.0"
+  spec.required_ruby_version = "~> 3.1"
 
   spec.summary = "Easily build protobuf compiler plugins in Ruby."
 
