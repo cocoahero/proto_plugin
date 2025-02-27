@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+rm -rf gen
+mkdir gen
+protoc --proto-plugin-demo_out=gen -I test/fixtures/blog test/fixtures/blog/*

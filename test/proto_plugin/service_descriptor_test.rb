@@ -5,10 +5,8 @@ require "test_helper"
 module ProtoPlugin
   class ServiceDescriptorTest < Minitest::Test
     def setup
-      @file = FileDescriptor.new(
-        load_file_fixture("service.proto"),
-      )
-
+      @context = Context.new(request: load_request_fixture)
+      @file = @context.file_by_filename("service.proto")
       @service = @file.services.first
     end
 

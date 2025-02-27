@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package proto_plugin.fixtures;
+
+enum Category {
+    CATEGORY_UNSPECIFIED = 0;
+    CATEGORY_ANNOUNCEMENT = 1;
+    CATEGORY_PRODUCT_RELEASE = 2;
+}
+
+enum Subcategory {
+    SUBCATEGORY_UNSPECIFIED = 0;
+    SUBCATEGORY_DEPRECATION = 1;
+}

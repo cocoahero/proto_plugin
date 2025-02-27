@@ -14,9 +14,11 @@ module ProtoPlugin
     # @return [Google::Protobuf::FileDescriptorProto]
     attr_reader :descriptor
 
+    # @param context [Context]
     # @param descriptor [Google::Protobuf::FileDescriptorProto]
-    def initialize(descriptor)
-      super
+    def initialize(context, descriptor)
+      super(descriptor)
+      @context = context
       @descriptor = descriptor
     end
 
@@ -80,7 +82,7 @@ module ProtoPlugin
     #   Google::Protobuf::DescriptorProto#service
     def services
       @services ||= @descriptor.service.map do |s|
-        ServiceDescriptor.new(s, self)
+        ServiceDescriptor.new(s, self, @context)
       end
     end
   end

@@ -38,7 +38,7 @@ module ProtoPlugin
     def test_files_to_generate
       files = @plugin.files_to_generate
 
-      assert_equal(3, files.count)
+      assert_equal(4, files.count)
 
       files.each do |f|
         assert_instance_of(FileDescriptor, f)

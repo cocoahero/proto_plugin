@@ -19,11 +19,21 @@ message Article {
 
     repeated Comment comments = 6;
 
+    enum Status {
+        DRAFT   = 0;
+        PUBLISHED = 1;
+        DELETED   = 2;
+    }
+
     message Author {
         string name = 1;
 
         string email = 2;
 
         string avatar = 3;
+    }
+
+    message Metadata {
+        repeated string tags = 1;
     }
 }

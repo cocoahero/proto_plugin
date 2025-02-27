@@ -48,6 +48,10 @@ module ProtoPlugin
     # @return [Google::Protobuf::Compiler::CodeGeneratorRequest]
     attr_reader :request
 
+    # The context for the current invocation of the plugin.
+    # @return [Context]
+    attr_reader :context
+
     # The response message to be sent back to `protoc`.
     # @return [Google::Protobuf::Compiler::CodeGeneratorResponse]
     attr_reader :response
@@ -56,6 +60,7 @@ module ProtoPlugin
     # `Google::Protobuf::Compiler::CodeGeneratorRequest`.
     def initialize(request:)
       @request = request
+      @context = Context.new(request: request)
       @response = Google::Protobuf::Compiler::CodeGeneratorResponse.new(
         supported_features: supported_features.reduce(&:|),
       )
@@ -95,11 +100,7 @@ module ProtoPlugin
     # @return [ProtoPlugin::FileDescriptor]
     # @return [nil] if the file was not found
     def lookup_file(name:)
-      @index_by_filename ||= @request.proto_file.each_with_object({}) do |fd, hash|
-        hash[fd.name] = FileDescriptor.new(fd)
-      end
-
-      @index_by_filename[name]
+      context.file_by_filename(name)
     end
 
     # Returns the list of supported `CodeGeneratorResponse::Feature` values by the plugin. The returned

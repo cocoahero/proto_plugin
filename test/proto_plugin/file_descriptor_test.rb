@@ -4,26 +4,19 @@ require "test_helper"
 
 module ProtoPlugin
   class FileDescriptorTest < Minitest::Test
+    def setup
+      @context = Context.new(request: load_request_fixture)
+    end
+
     def test_name
-      file = FileDescriptor.new(Google::Protobuf::FileDescriptorProto.new(
-        name: "sample.proto",
-      ))
-      assert_equal("sample.proto", file.name)
+      file = @context.file_by_filename("article.proto")
+      assert_instance_of(FileDescriptor, file)
+      assert_equal("article.proto", file.name)
     end
 
     def test_enums
-      file = FileDescriptor.new(
-        Google::Protobuf::FileDescriptorProto.new(
-          package: "my.package.name", enum_type: [
-            Google::Protobuf::EnumDescriptorProto.new(
-              name: "RootEnumOne",
-            ),
-            Google::Protobuf::EnumDescriptorProto.new(
-              name: "RootEnumTwo",
-            ),
-          ]
-        ),
-      )
+      file = @context.file_by_filename("category.proto")
+      assert_instance_of(FileDescriptor, file)
 
       assert_equal(2, file.enums.count)
 
@@ -35,65 +28,41 @@ module ProtoPlugin
     end
 
     def test_messages
-      file = FileDescriptor.new(
-        Google::Protobuf::FileDescriptorProto.new(
-          package: "my.package.name", message_type: [
-            Google::Protobuf::DescriptorProto.new(
-              name: "RootMessageOne",
-            ),
-            Google::Protobuf::DescriptorProto.new(
-              name: "RootMessageTwo",
-            ),
-          ]
-        ),
-      )
-      assert_equal(2, file.messages.count)
+      file = @context.file_by_filename("article.proto")
+      assert_instance_of(FileDescriptor, file)
+
+      assert_equal(1, file.messages.count)
 
       message_one = file.messages[0]
       assert_instance_of(MessageDescriptor, message_one)
-
-      message_two = file.messages[1]
-      assert_instance_of(MessageDescriptor, message_two)
     end
 
     def test_services
-      file = FileDescriptor.new(
-        Google::Protobuf::FileDescriptorProto.new(
-          package: "my.package.name", service: [
-            Google::Protobuf::ServiceDescriptorProto.new(
-              name: "ServiceOne",
-            ),
-            Google::Protobuf::ServiceDescriptorProto.new(
-              name: "ServiceTwo",
-            ),
-          ]
-        ),
-      )
-      assert_equal(2, file.services.count)
+      file = @context.file_by_filename("service.proto")
+      assert_instance_of(FileDescriptor, file)
+
+      assert_equal(1, file.services.count)
 
       service_one = file.services[0]
       assert_instance_of(ServiceDescriptor, service_one)
-
-      service_two = file.services[1]
-      assert_instance_of(ServiceDescriptor, service_two)
     end
 
     def test_namespace_without_package
-      file = FileDescriptor.new(Google::Protobuf::FileDescriptorProto.new(
+      file = FileDescriptor.new(@context, Google::Protobuf::FileDescriptorProto.new(
         name: "sample.proto",
       ))
       assert_equal("", file.namespace)
     end
 
     def test_namespace_with_package
-      file = FileDescriptor.new(Google::Protobuf::FileDescriptorProto.new(
+      file = FileDescriptor.new(@context, Google::Protobuf::FileDescriptorProto.new(
         name: "sample.proto", package: "my.package.name",
       ))
       assert_equal("My::Package::Name", file.namespace)
     end
 
     def test_namespace_with_ruby_package
-      file = FileDescriptor.new(Google::Protobuf::FileDescriptorProto.new(
+      file = FileDescriptor.new(@context, Google::Protobuf::FileDescriptorProto.new(
         name: "sample.proto", options: Google::Protobuf::FileOptions.new(
           ruby_package: "My::Ruby::Namespace",
         )
@@ -102,7 +71,7 @@ module ProtoPlugin
     end
 
     def test_namespace_with_package_and_ruby_package
-      file = FileDescriptor.new(Google::Protobuf::FileDescriptorProto.new(
+      file = FileDescriptor.new(@context, Google::Protobuf::FileDescriptorProto.new(
         name: "sample.proto", package: "my.package.name", options: Google::Protobuf::FileOptions.new(
           ruby_package: "My::Ruby::Namespace",
         )
@@ -111,7 +80,7 @@ module ProtoPlugin
     end
 
     def test_namespace_with_split_option
-      file = FileDescriptor.new(Google::Protobuf::FileDescriptorProto.new(
+      file = FileDescriptor.new(@context, Google::Protobuf::FileDescriptorProto.new(
         name: "sample.proto", package: "my.package.name",
       ))
       assert_equal(["My", "Package", "Name"], file.namespace(split: true))
