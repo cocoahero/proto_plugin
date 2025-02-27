@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    proto_plugin (0.2.0)
+    proto_plugin (0.3.0)
       google-protobuf (~> 4.28)
 
 GEM
@@ -13,9 +13,6 @@ GEM
       irb (~> 1.10)
       reline (>= 0.3.8)
     google-protobuf (4.28.0)
-      bigdecimal
-      rake (>= 13)
-    google-protobuf (4.28.0-arm64-darwin)
       bigdecimal
       rake (>= 13)
     io-console (0.7.2)
@@ -71,4 +68,4 @@ DEPENDENCIES
   yard (~> 0.9.37)
 
 BUNDLED WITH
-   2.5.18
+   2.6.5
