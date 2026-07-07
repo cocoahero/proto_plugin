@@ -8,6 +8,7 @@ module ProtoPlugin
   class Context
     # Initializes a context from a given `Google::Protobuf::Compiler::CodeGeneratorRequest`.
     def initialize(request:)
+      @proto_files = request.proto_file
       index_files_by_filename(request.proto_file)
       index_types_by_proto_name
     end
@@ -24,7 +25,42 @@ module ProtoPlugin
       @types_by_proto_name[name]
     end
 
+    # Reads the value of a custom option (an extension of one of the
+    # `google.protobuf.*Options` messages) from an options message.
+    #
+    # The Ruby runtime cannot read extensions from the code-generated option
+    # types carried in a `CodeGeneratorRequest`, so this rebuilds a descriptor
+    # pool from the request's files and re-decodes the options through it,
+    # where the extension is resolvable. The rebuilt pool is memoized.
+    #
+    # @param options [Google::Protobuf::MessageOptions, Google::Protobuf::FieldOptions, ...]
+    #   the raw options message from a descriptor (`descriptor.options`)
+    # @param name [String] the fully-qualified extension name, e.g. `"my.pkg.table"`
+    # @return the option's value, or `nil` if unset or unknown
+    def option(options, name)
+      return if options.nil?
+
+      extension = extension_pool.lookup(name)
+      return if extension.nil?
+
+      options_class = extension_pool.lookup(options.class.descriptor.name)&.msgclass
+      return if options_class.nil?
+
+      extension.get(options_class.decode(options.to_proto))
+    end
+
     private
+
+    # A descriptor pool rebuilt from every file in the request. Unlike the
+    # generated pool, this one knows about the request's custom-option
+    # extensions, so they can be resolved and read.
+    #
+    # @return [Google::Protobuf::DescriptorPool]
+    def extension_pool
+      @extension_pool ||= Google::Protobuf::DescriptorPool.new.tap do |pool|
+        @proto_files.each { |file| pool.add_serialized_file(file.to_proto) }
+      end
+    end
 
     def index_files_by_filename(files)
       @files_by_filename = files.each_with_object({}) do |fd, hash|

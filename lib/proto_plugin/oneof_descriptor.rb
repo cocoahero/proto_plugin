@@ -12,6 +12,7 @@ module ProtoPlugin
   #   Google::Protobuf::OneofDescriptorProto
   class OneofDescriptor < SimpleDelegator
     include Commentable
+    include Optionable
 
     # @return [Google::Protobuf::OneofDescriptorProto]
     attr_reader :descriptor

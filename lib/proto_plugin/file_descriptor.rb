@@ -12,9 +12,14 @@ module ProtoPlugin
   #   Google::Protobuf::FileDescriptorProto
   class FileDescriptor < SimpleDelegator
     include Commentable
+    include Optionable
 
     # @return [Google::Protobuf::FileDescriptorProto]
     attr_reader :descriptor
+
+    # The context for the current plugin invocation.
+    # @return [Context]
+    attr_reader :context
 
     # @param context [Context]
     # @param descriptor [Google::Protobuf::FileDescriptorProto]

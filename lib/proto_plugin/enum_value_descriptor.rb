@@ -12,6 +12,7 @@ module ProtoPlugin
   #   Google::Protobuf::EnumValueDescriptorProto
   class EnumValueDescriptor < SimpleDelegator
     include Commentable
+    include Optionable
 
     # @return [Google::Protobuf::EnumValueDescriptorProto]
     attr_reader :descriptor

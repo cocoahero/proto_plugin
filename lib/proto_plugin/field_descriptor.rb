@@ -12,6 +12,7 @@ module ProtoPlugin
   #   Google::Protobuf::FieldDescriptorProto
   class FieldDescriptor < SimpleDelegator
     include Commentable
+    include Optionable
 
     # @return [Google::Protobuf::FieldDescriptorProto]
     attr_reader :descriptor

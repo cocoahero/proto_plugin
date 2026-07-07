@@ -4,10 +4,22 @@ package proto_plugin.fixtures;
 
 import "google/protobuf/timestamp.proto";
 
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.MessageOptions {
+    string table = 50002;
+}
+
+extend google.protobuf.FieldOptions {
+    bool pii = 50003;
+}
+
 message Comment {
+    option (table) = "comments";
+
     uint64 id = 1;
 
-    string username = 2;
+    string username = 2 [(pii) = true];
 
     string content = 3;
 

@@ -11,6 +11,7 @@ module ProtoPlugin
   # @see https://github.com/protocolbuffers/protobuf/blob/v28.2/src/google/protobuf/descriptor.proto#L336
   class EnumDescriptor < SimpleDelegator
     include Commentable
+    include Optionable
 
     # @return [Google::Protobuf::EnumDescriptorProto]
     attr_reader :descriptor

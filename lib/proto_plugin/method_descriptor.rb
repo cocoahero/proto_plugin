@@ -11,6 +11,7 @@ module ProtoPlugin
   # @see https://github.com/protocolbuffers/protobuf/blob/v28.2/src/google/protobuf/descriptor.proto#L381
   class MethodDescriptor < SimpleDelegator
     include Commentable
+    include Optionable
 
     # @return [Google::Protobuf::MethodDescriptorProto]
     attr_reader :descriptor

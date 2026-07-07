@@ -11,6 +11,7 @@ module ProtoPlugin
   # @see https://github.com/protocolbuffers/protobuf/blob/v28.2/src/google/protobuf/descriptor.proto#L373
   class ServiceDescriptor < SimpleDelegator
     include Commentable
+    include Optionable
 
     # @return [Google::Protobuf::ServiceDescriptorProto]
     attr_reader :descriptor
