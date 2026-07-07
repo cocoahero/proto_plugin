@@ -4,7 +4,7 @@ package proto_plugin.fixtures;
 
 import "google/protobuf/timestamp.proto";
 
-import "comment.proto";
+import public "comment.proto";
 
 // An article published on the blog.
 message Article {

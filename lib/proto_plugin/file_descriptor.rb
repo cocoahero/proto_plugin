@@ -108,6 +108,34 @@ module ProtoPlugin
       end
     end
 
+    # The files imported by this file, resolved to their descriptors.
+    #
+    # Imports that were not included in the request are omitted.
+    #
+    # @return [Array<FileDescriptor>]
+    #
+    # @see https://github.com/protocolbuffers/protobuf/blob/v28.2/src/google/protobuf/descriptor.proto#L100
+    #   Google::Protobuf::FileDescriptorProto#dependency
+    def imports
+      @imports ||= @descriptor.dependency.filter_map do |name|
+        @context.file_by_filename(name)
+      end
+    end
+
+    # The subset of {#imports} that were declared with `import public`, resolved
+    # to their descriptors.
+    #
+    # @return [Array<FileDescriptor>]
+    #
+    # @see https://github.com/protocolbuffers/protobuf/blob/v28.2/src/google/protobuf/descriptor.proto#L103
+    #   Google::Protobuf::FileDescriptorProto#public_dependency
+    def public_imports
+      @public_imports ||= @descriptor.public_dependency.filter_map do |i|
+        name = @descriptor.dependency[i]
+        @context.file_by_filename(name) if name
+      end
+    end
+
     private
 
     # Field numbers of the relevant repeated fields within their parent
