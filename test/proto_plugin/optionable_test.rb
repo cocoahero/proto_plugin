@@ -37,5 +37,15 @@ module ProtoPlugin
       article = @context.type_by_proto_name(".proto_plugin.fixtures.Article")
       assert_nil(article.option("proto_plugin.fixtures.table"))
     end
+
+    def test_repeated_option
+      digest = @context.type_by_proto_name(".proto_plugin.fixtures.CommentDigest")
+      assert_equal(["digest", "summary"], digest.option("aliases").to_a)
+    end
+
+    def test_message_typed_option_raises
+      digest = @context.type_by_proto_name(".proto_plugin.fixtures.CommentDigest")
+      assert_raises(NotImplementedError) { digest.option("retention") }
+    end
   end
 end

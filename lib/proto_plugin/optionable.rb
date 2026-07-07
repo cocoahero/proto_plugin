@@ -27,8 +27,13 @@ module ProtoPlugin
     # @example An option from another package
     #   field.option("google.api.field_behavior")
     #
+    # Scalar and repeated-scalar options are supported. Message-typed options
+    # raise `NotImplementedError`, as the google-protobuf runtime cannot read
+    # them.
+    #
     # @param name [String] the option's extension name, bare or fully-qualified
     # @return the option's value, or `nil` if it was not set
+    # @raise [NotImplementedError] if the option is message-typed
     def option(name)
       file.context.option(descriptor.options, qualified_option_name(name))
     end

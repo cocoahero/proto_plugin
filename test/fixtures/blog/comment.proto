@@ -6,8 +6,14 @@ import "google/protobuf/timestamp.proto";
 
 import "google/protobuf/descriptor.proto";
 
+message Retention {
+    int32 days = 1;
+}
+
 extend google.protobuf.MessageOptions {
     string table = 50002;
+    repeated string aliases = 50004;
+    Retention retention = 50005;
 }
 
 extend google.protobuf.FieldOptions {
@@ -48,6 +54,10 @@ message CommentEvent {
 }
 
 message CommentDigest {
+    option (aliases) = "digest";
+    option (aliases) = "summary";
+    option (retention) = { days: 30 };
+
     map<string, uint64> counts_by_user = 1;
 
     repeated string labels = 2;

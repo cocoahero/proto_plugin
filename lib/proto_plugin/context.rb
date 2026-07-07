@@ -43,6 +43,15 @@ module ProtoPlugin
       extension = extension_pool.lookup(name)
       return if extension.nil?
 
+      if extension.type == :message
+        # google-protobuf's FieldDescriptor#get raises for message-typed
+        # extensions (as of 4.35.1), so fail with an explanation rather than
+        # a cryptic TypeError or a misleading nil for an option that is set.
+        raise NotImplementedError,
+          "reading message-typed custom options (#{name}) is not supported by " \
+            "the google-protobuf runtime; only scalar and repeated-scalar options can be read"
+      end
+
       options_class = extension_pool.lookup(options.class.descriptor.name)&.msgclass
       return if options_class.nil?
 
