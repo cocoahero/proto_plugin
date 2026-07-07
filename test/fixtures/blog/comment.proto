@@ -34,3 +34,13 @@ message CommentEvent {
         bool deleted = 4;
     }
 }
+
+message CommentDigest {
+    map<string, uint64> counts_by_user = 1;
+
+    repeated string labels = 2;
+
+    Comment.Status status = 3;
+
+    map<uint64, Comment> comments_by_id = 4;
+}

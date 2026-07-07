@@ -86,6 +86,49 @@ module ProtoPlugin
       refute(@fields["title"].proto3_optional?)
     end
 
+    def test_scalar_map
+      digest = @context.type_by_proto_name(".proto_plugin.fixtures.CommentDigest")
+      counts = digest.fields.find { |f| f.name == "counts_by_user" }
+
+      assert(counts.map?)
+
+      # A map is neither a repeated, message, nor scalar field.
+      refute(counts.repeated?)
+      refute(counts.message?)
+      refute(counts.scalar?)
+      assert_nil(counts.type_descriptor)
+
+      assert_equal("key", counts.key.name)
+      assert(counts.key.scalar?)
+      assert_equal("value", counts.value.name)
+      assert(counts.value.scalar?)
+    end
+
+    def test_message_valued_map
+      digest = @context.type_by_proto_name(".proto_plugin.fixtures.CommentDigest")
+      comments = digest.fields.find { |f| f.name == "comments_by_id" }
+
+      assert(comments.map?)
+      assert(comments.value.message?)
+      assert_equal("ProtoPlugin::Fixtures::Comment", comments.value.type_descriptor.full_name)
+    end
+
+    def test_repeated_scalar_is_not_a_map
+      digest = @context.type_by_proto_name(".proto_plugin.fixtures.CommentDigest")
+      labels = digest.fields.find { |f| f.name == "labels" }
+
+      refute(labels.map?)
+      assert(labels.repeated?)
+      assert(labels.scalar?)
+      assert_nil(labels.key)
+      assert_nil(labels.value)
+    end
+
+    def test_synthetic_map_entries_excluded_from_messages
+      digest = @context.type_by_proto_name(".proto_plugin.fixtures.CommentDigest")
+      assert_empty(digest.messages)
+    end
+
     def test_oneof_membership
       event = @context.type_by_proto_name(".proto_plugin.fixtures.CommentEvent")
       fields = event.fields.each_with_object({}) do |field, hash|
