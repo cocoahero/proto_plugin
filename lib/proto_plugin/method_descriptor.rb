@@ -10,6 +10,8 @@ module ProtoPlugin
   #
   # @see https://github.com/protocolbuffers/protobuf/blob/v28.2/src/google/protobuf/descriptor.proto#L381
   class MethodDescriptor < SimpleDelegator
+    include Commentable
+
     # @return [Google::Protobuf::MethodDescriptorProto]
     attr_reader :descriptor
 
@@ -26,6 +28,13 @@ module ProtoPlugin
       @descriptor = descriptor
       @service = service
       @context = context
+    end
+
+    # The file descriptor this method belongs to.
+    #
+    # @return [FileDescriptor]
+    def file
+      service.file
     end
 
     # Returns the `MessageDescriptor` of the method's input type.

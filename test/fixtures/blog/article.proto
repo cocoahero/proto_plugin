@@ -6,10 +6,12 @@ import "google/protobuf/timestamp.proto";
 
 import "comment.proto";
 
+// An article published on the blog.
 message Article {
+    // The unique identifier for the article.
     uint64 id = 1;
-    
-    string title = 2;
+
+    string title = 2; // The article's headline.
 
     Author author = 3;
 
@@ -19,7 +21,9 @@ message Article {
 
     repeated Comment comments = 6;
 
+    // The lifecycle status of an article.
     enum Status {
+        // The article is a work in progress.
         DRAFT   = 0;
         PUBLISHED = 1;
         DELETED   = 2;

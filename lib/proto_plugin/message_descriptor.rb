@@ -11,6 +11,8 @@ module ProtoPlugin
   # @see https://github.com/protocolbuffers/protobuf/blob/v28.2/src/google/protobuf/descriptor.proto#L134
   #   Google::Protobuf::DescriptorProto
   class MessageDescriptor < SimpleDelegator
+    include Commentable
+
     # @return [Google::Protobuf::DescriptorProto]
     attr_reader :descriptor
 
@@ -23,10 +25,43 @@ module ProtoPlugin
     # @param descriptor [Google::Protobuf::DescriptorProto]
     # @param parent [FileDescriptorFileDescriptorProto, MessageDescriptor]
     #   The file or message descriptor this message was defined within.
-    def initialize(descriptor, parent)
+    # @param context [Context]
+    def initialize(descriptor, parent, context)
       super(descriptor)
       @descriptor = descriptor
       @parent = parent
+      @context = context
+    end
+
+    # The file descriptor this message belongs to.
+    #
+    # @return [FileDescriptor]
+    def file
+      parent.file
+    end
+
+    # The fields defined on this message.
+    #
+    # @return [Array<FieldDescriptor>]
+    #
+    # @see https://github.com/protocolbuffers/protobuf/blob/v28.2/src/google/protobuf/descriptor.proto#L138
+    #   Google::Protobuf::DescriptorProto#field
+    def fields
+      @fields ||= @descriptor.field.map do |f|
+        FieldDescriptor.new(f, self, @context)
+      end
+    end
+
+    # The oneofs defined on this message.
+    #
+    # @return [Array<OneofDescriptor>]
+    #
+    # @see https://github.com/protocolbuffers/protobuf/blob/v28.2/src/google/protobuf/descriptor.proto#L145
+    #   Google::Protobuf::DescriptorProto#oneof_decl
+    def oneofs
+      @oneofs ||= @descriptor.oneof_decl.each_with_index.map do |o, i|
+        OneofDescriptor.new(o, self, i)
+      end
     end
 
     # The enums defined as children of this message.
@@ -49,7 +84,7 @@ module ProtoPlugin
     #   Google::Protobuf::DescriptorProto#nested_type
     def messages
       @nested_messages ||= @descriptor.nested_type.map do |m|
-        MessageDescriptor.new(m, self)
+        MessageDescriptor.new(m, self, @context)
       end
     end
 

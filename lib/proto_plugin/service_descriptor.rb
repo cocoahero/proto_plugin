@@ -10,6 +10,8 @@ module ProtoPlugin
   #
   # @see https://github.com/protocolbuffers/protobuf/blob/v28.2/src/google/protobuf/descriptor.proto#L373
   class ServiceDescriptor < SimpleDelegator
+    include Commentable
+
     # @return [Google::Protobuf::ServiceDescriptorProto]
     attr_reader :descriptor
 
@@ -26,6 +28,13 @@ module ProtoPlugin
       @descriptor = descriptor
       @parent = parent
       @context = context
+    end
+
+    # The file descriptor this service belongs to.
+    #
+    # @return [FileDescriptor]
+    def file
+      parent.file
     end
 
     # The full name of the service, including parent namespace.
