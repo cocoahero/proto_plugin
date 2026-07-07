@@ -37,22 +37,13 @@ module ProtoPlugin
       presence(source_location&.trailing_comments)
     end
 
-    # Any comment blocks that were detached from this element by one or more
-    # blank lines.
-    #
-    # @return [Array<String>]
-    def leading_detached_comments
-      source_location&.leading_detached_comments&.to_a || []
-    end
-
     # The comments attached to this element, in source order: the leading
     # comment followed by the trailing comment. Absent blocks are omitted.
     #
-    # Detached comments are intentionally excluded. Per protoc, they appear
-    # before "but [are] not connected to" the element (the author separated
-    # them with a blank line), so they are section headers or notes rather
-    # than documentation of the element. Access them via
-    # {#leading_detached_comments} if needed.
+    # Detached comments (blocks the author separated from the element with a
+    # blank line) are not exposed. Per protoc they appear before "but [are]
+    # not connected to" the element, so they are file organization rather than
+    # documentation of any element.
     #
     # @example
     #   field.comments.join("\n").strip

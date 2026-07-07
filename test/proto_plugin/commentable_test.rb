@@ -67,26 +67,11 @@ module ProtoPlugin
       assert_empty(author.comments)
     end
 
-    def test_comments_excludes_detached
-      metadata = @context.type_by_proto_name(".proto_plugin.fixtures.Article.Metadata")
-
-      # The detached block is reachable on its own accessor...
-      assert_equal(
-        [" A detached note that documents nothing in particular.\n"],
-        metadata.leading_detached_comments,
-      )
-
-      # ...but is not treated as documentation of the element.
-      assert_nil(metadata.leading_comments)
-      assert_empty(metadata.comments)
-    end
-
     def test_absent_comments_are_nil
       author = @article.fields.find { |f| f.name == "author" }
 
       assert_nil(author.leading_comments)
       assert_nil(author.trailing_comments)
-      assert_empty(author.leading_detached_comments)
     end
 
     def test_file_resolves_to_owning_descriptor
