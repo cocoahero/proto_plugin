@@ -31,6 +31,20 @@ module ProtoPlugin
       assert_equal(@message, child_two.parent)
     end
 
+    def test_fields
+      assert_equal(6, @message.fields.count)
+
+      @message.fields.each do |f|
+        assert_instance_of(FieldDescriptor, f)
+        assert_equal(@message, f.message)
+      end
+
+      assert_equal(
+        ["id", "title", "author", "content", "published_at", "comments"],
+        @message.fields.map(&:name),
+      )
+    end
+
     def test_full_name
       child_one = @message.messages[0]
       child_two = @message.messages[1]

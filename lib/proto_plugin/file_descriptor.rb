@@ -42,7 +42,7 @@ module ProtoPlugin
     #   Google::Protobuf::DescriptorProto#message_type
     def messages
       @messages ||= @descriptor.message_type.map do |m|
-        MessageDescriptor.new(m, self)
+        MessageDescriptor.new(m, self, @context)
       end
     end
 
