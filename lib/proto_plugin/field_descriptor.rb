@@ -86,21 +86,56 @@ module ProtoPlugin
     #
     # @return [Boolean]
     def message?
-      type == :TYPE_MESSAGE && !map?
+      type == :message && !map?
     end
 
     # Returns true if the field is an enum type.
     #
     # @return [Boolean]
     def enum?
-      type == :TYPE_ENUM
+      type == :enum
     end
 
     # Returns true if the field is a group type.
     #
     # @return [Boolean]
     def group?
-      type == :TYPE_GROUP
+      type == :group
+    end
+
+    # The field's type as a plain symbol.
+    #
+    # Normalizes the underlying `type` enum by removing its `TYPE_` prefix and
+    # downcasing, e.g. `:TYPE_INT32` becomes `:int32` and `:TYPE_MESSAGE`
+    # becomes `:message`. For `:message` and `:enum` fields, use
+    # {#type_descriptor} (or {#key}/{#value} for maps) to resolve the referenced
+    # type.
+    #
+    # @example
+    #   field.type   #=> :int32
+    #   field.type   #=> :message
+    #
+    # @return [Symbol]
+    def type
+      descriptor.type.to_s.delete_prefix("TYPE_").downcase.to_sym
+    end
+
+    # The JSON name of the field, as computed by `protoc` (the lowerCamelCase
+    # form unless overridden with the `json_name` option).
+    #
+    # @return [String]
+    def json_name
+      descriptor.json_name
+    end
+
+    # The explicit default value declared for the field (proto2 only), as a
+    # string. Proto3 fields do not carry defaults.
+    #
+    # @return [String] the declared default
+    # @return [nil] if no default was declared
+    def default_value
+      value = descriptor.default_value
+      value unless value.nil? || value.empty?
     end
 
     # Returns true if the field is a scalar type (i.e. not a message, enum,
@@ -183,7 +218,7 @@ module ProtoPlugin
     def map_entry
       return @map_entry if defined?(@map_entry)
 
-      @map_entry = if repeated_label? && type == :TYPE_MESSAGE
+      @map_entry = if repeated_label? && type == :message
         name = type_name.split(".").last
         proto = message.descriptor.nested_type.find do |n|
           n.name == name && n.options&.map_entry
