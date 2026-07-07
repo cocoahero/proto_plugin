@@ -54,6 +54,19 @@ module ProtoPlugin
       assert_equal(" Describes what happened to the comment.\n", event.oneofs.first.leading_comments)
     end
 
+    def test_comments_aggregates_leading_and_trailing
+      title = @article.fields.find { |f| f.name == "title" }
+      assert_equal([" The article's headline.\n"], title.comments)
+
+      id = @article.fields.find { |f| f.name == "id" }
+      assert_equal([" The unique identifier for the article.\n"], id.comments)
+    end
+
+    def test_comments_empty_when_absent
+      author = @article.fields.find { |f| f.name == "author" }
+      assert_empty(author.comments)
+    end
+
     def test_absent_comments_are_nil
       author = @article.fields.find { |f| f.name == "author" }
 

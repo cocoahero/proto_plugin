@@ -45,6 +45,20 @@ module ProtoPlugin
       source_location&.leading_detached_comments&.to_a || []
     end
 
+    # All comments associated with this element, in source order: any detached
+    # blocks first, then the leading comment, then the trailing comment. Blocks
+    # that are absent or empty are omitted.
+    #
+    # @example
+    #   field.comments.join("\n").strip
+    #
+    # @return [Array<String>]
+    def comments
+      [*leading_detached_comments, leading_comments, trailing_comments]
+        .compact
+        .reject(&:empty?)
+    end
+
     private
 
     def presence(value)
