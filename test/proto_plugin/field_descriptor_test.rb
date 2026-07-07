@@ -129,6 +129,36 @@ module ProtoPlugin
       assert_empty(digest.messages)
     end
 
+    def test_type_normalizes_the_enum
+      assert_equal(:uint64, @fields["id"].type)
+      assert_equal(:string, @fields["title"].type)
+      assert_equal(:message, @fields["author"].type)
+      assert_equal(:message, @fields["comments"].type) # repeated message
+    end
+
+    def test_json_name
+      assert_equal("publishedAt", @fields["published_at"].json_name)
+      assert_equal("title", @fields["title"].json_name)
+    end
+
+    def test_default_value
+      field = FieldDescriptor.new(
+        Google::Protobuf::FieldDescriptorProto.new(
+          name: "count",
+          type: :TYPE_INT32,
+          default_value: "42",
+        ),
+        @article,
+        @context,
+      )
+
+      assert_equal("42", field.default_value)
+    end
+
+    def test_default_value_nil_when_absent
+      assert_nil(@fields["title"].default_value)
+    end
+
     def test_oneof_membership
       event = @context.type_by_proto_name(".proto_plugin.fixtures.CommentEvent")
       fields = event.fields.each_with_object({}) do |field, hash|
