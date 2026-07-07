@@ -41,23 +41,52 @@ module ProtoPlugin
     # Resolves the message or enum descriptor referenced by this field.
     #
     # Only message, enum, and group fields reference another type. For scalar
-    # fields (or when the referenced type was not included in the request),
-    # `nil` is returned.
+    # and map fields (or when the referenced type was not included in the
+    # request), `nil` is returned. For a map field, inspect {#key} and {#value}
+    # instead.
     #
     # @return [MessageDescriptor] if the field is a message or group type
     # @return [EnumDescriptor] if the field is an enum type
-    # @return [nil] if the field is a scalar type or the type was not found
+    # @return [nil] if the field is a scalar or map type, or the type was not found
     def type_descriptor
-      return if scalar?
+      return unless message? || enum? || group?
 
       @context.type_by_proto_name(type_name)
     end
 
-    # Returns true if the field is a message type.
+    # Returns true if the field is a `map<K, V>` field.
+    #
+    # A map is represented on the wire as a repeated message of synthetic
+    # entries. This detects that representation so callers can treat maps
+    # distinctly from repeated message fields.
+    #
+    # @return [Boolean]
+    def map?
+      !map_entry.nil?
+    end
+
+    # The map key field, for a map field.
+    #
+    # @return [FieldDescriptor] the synthetic entry's key field (number 1)
+    # @return [nil] if the field is not a map
+    def key
+      map_entry&.fields&.find { |f| f.number == 1 }
+    end
+
+    # The map value field, for a map field.
+    #
+    # @return [FieldDescriptor] the synthetic entry's value field (number 2)
+    # @return [nil] if the field is not a map
+    def value
+      map_entry&.fields&.find { |f| f.number == 2 }
+    end
+
+    # Returns true if the field is a message type. Map fields are excluded; use
+    # {#map?} to detect those.
     #
     # @return [Boolean]
     def message?
-      type == :TYPE_MESSAGE
+      type == :TYPE_MESSAGE && !map?
     end
 
     # Returns true if the field is an enum type.
@@ -74,18 +103,20 @@ module ProtoPlugin
       type == :TYPE_GROUP
     end
 
-    # Returns true if the field is a scalar type (i.e. not a message, enum, or group).
+    # Returns true if the field is a scalar type (i.e. not a message, enum,
+    # group, or map).
     #
     # @return [Boolean]
     def scalar?
-      !message? && !enum? && !group?
+      !map? && !message? && !enum? && !group?
     end
 
-    # Returns true if the field has the `repeated` label.
+    # Returns true if the field has the `repeated` label. Map fields are
+    # excluded; use {#map?} to detect those.
     #
     # @return [Boolean]
     def repeated?
-      label == :LABEL_REPEATED
+      repeated_label? && !map?
     end
 
     # Returns true if the field has the `required` label (proto2 only).
@@ -131,6 +162,34 @@ module ProtoPlugin
       return unless oneof?
 
       message.oneofs[descriptor.oneof_index]
+    end
+
+    private
+
+    def repeated_label?
+      label == :LABEL_REPEATED
+    end
+
+    # The synthetic map-entry message backing a map field, if this is one.
+    #
+    # A map field is a repeated message whose type is a nested message flagged
+    # with the `map_entry` option. The entry is resolved directly from the
+    # containing message's raw `nested_type` (rather than the context) because
+    # synthetic entries are intentionally excluded from {MessageDescriptor#messages}
+    # and therefore from the context's type index.
+    #
+    # @return [MessageDescriptor]
+    # @return [nil] if the field is not a map
+    def map_entry
+      return @map_entry if defined?(@map_entry)
+
+      @map_entry = if repeated_label? && type == :TYPE_MESSAGE
+        name = type_name.split(".").last
+        proto = message.descriptor.nested_type.find do |n|
+          n.name == name && n.options&.map_entry
+        end
+        MessageDescriptor.new(proto, message, @context) if proto
+      end
     end
   end
 end
