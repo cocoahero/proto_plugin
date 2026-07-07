@@ -15,13 +15,31 @@ module ProtoPlugin
   module Optionable
     # Reads the value of a custom option set on this element.
     #
-    # @example `message User { option (my.pkg.table) = "users"; }`
-    #   message.option("my.pkg.table") #=> "users"
+    # A bare option name (no `.`) is resolved relative to this element's file
+    # package, matching how the option is declared in the same package. A
+    # qualified name (containing a `.`) is used as-is, for options defined in
+    # another package.
     #
-    # @param name [String] the fully-qualified extension name of the option
+    # @example An option declared in the element's own package
+    #   # message User { option (my.pkg.table) = "users"; }  (package my.pkg)
+    #   message.option("table") #=> "users"
+    #
+    # @example An option from another package
+    #   field.option("google.api.field_behavior")
+    #
+    # @param name [String] the option's extension name, bare or fully-qualified
     # @return the option's value, or `nil` if it was not set
     def option(name)
-      file.context.option(descriptor.options, name)
+      file.context.option(descriptor.options, qualified_option_name(name))
+    end
+
+    private
+
+    def qualified_option_name(name)
+      return name if name.include?(".")
+
+      package = file.package
+      package.nil? || package.empty? ? name : "#{package}.#{name}"
     end
   end
 end

@@ -9,12 +9,18 @@ module ProtoPlugin
       @comment = @context.type_by_proto_name(".proto_plugin.fixtures.Comment")
     end
 
-    def test_message_option
+    def test_message_option_bare_name
+      # Resolved relative to the element's package (proto_plugin.fixtures).
+      assert_equal("comments", @comment.option("table"))
+    end
+
+    def test_message_option_fully_qualified_name
       assert_equal("comments", @comment.option("proto_plugin.fixtures.table"))
     end
 
     def test_field_option
       username = @comment.fields.find { |f| f.name == "username" }
+      assert_equal(true, username.option("pii"))
       assert_equal(true, username.option("proto_plugin.fixtures.pii"))
     end
 
