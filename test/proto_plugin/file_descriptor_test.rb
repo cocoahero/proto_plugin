@@ -47,6 +47,33 @@ module ProtoPlugin
       assert_instance_of(ServiceDescriptor, service_one)
     end
 
+    def test_imports
+      file = @context.file_by_filename("article.proto")
+
+      assert_equal(
+        ["google/protobuf/timestamp.proto", "comment.proto"],
+        file.imports.map(&:name),
+      )
+
+      file.imports.each do |i|
+        assert_instance_of(FileDescriptor, i)
+      end
+    end
+
+    def test_public_imports
+      file = @context.file_by_filename("article.proto")
+
+      assert_equal(["comment.proto"], file.public_imports.map(&:name))
+      assert_instance_of(FileDescriptor, file.public_imports.first)
+    end
+
+    def test_imports_empty_without_dependencies
+      file = @context.file_by_filename("category.proto")
+
+      assert_empty(file.imports)
+      assert_empty(file.public_imports)
+    end
+
     def test_namespace_without_package
       file = FileDescriptor.new(@context, Google::Protobuf::FileDescriptorProto.new(
         name: "sample.proto",
