@@ -18,5 +18,16 @@ module ProtoPlugin
       enum = @article.enums.first
       assert_equal("ProtoPlugin::Fixtures::Article::Status", enum.full_name)
     end
+
+    def test_values
+      assert_equal(
+        ["CATEGORY_UNSPECIFIED", "CATEGORY_ANNOUNCEMENT", "CATEGORY_PRODUCT_RELEASE"],
+        @category.values.map(&:name),
+      )
+
+      @category.values.each do |v|
+        assert_instance_of(EnumValueDescriptor, v)
+      end
+    end
   end
 end

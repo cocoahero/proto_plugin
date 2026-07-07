@@ -103,5 +103,25 @@ module ProtoPlugin
     def proto3_optional?
       descriptor.proto3_optional
     end
+
+    # Returns true if the field is a member of a oneof.
+    #
+    # @note Fields declared with the proto3 `optional` keyword are backed by a
+    #   synthetic oneof. Those are not considered oneof members here.
+    #
+    # @return [Boolean]
+    def oneof?
+      descriptor.has_oneof_index? && !proto3_optional?
+    end
+
+    # The oneof this field is a member of, if any.
+    #
+    # @return [OneofDescriptor] if the field is a member of a oneof
+    # @return [nil] otherwise
+    def oneof
+      return unless oneof?
+
+      message.oneofs[descriptor.oneof_index]
+    end
   end
 end

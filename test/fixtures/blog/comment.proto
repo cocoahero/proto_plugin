@@ -23,3 +23,13 @@ message Comment {
         DELETED   = 4;
     }
 }
+
+message CommentEvent {
+    uint64 comment_id = 1;
+
+    oneof payload {
+        string created = 2;
+        string edited = 3;
+        bool deleted = 4;
+    }
+}

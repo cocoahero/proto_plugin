@@ -45,6 +45,17 @@ module ProtoPlugin
       )
     end
 
+    def test_oneofs
+      event = @context.type_by_proto_name(".proto_plugin.fixtures.CommentEvent")
+
+      assert_equal(1, event.oneofs.count)
+
+      oneof = event.oneofs.first
+      assert_instance_of(OneofDescriptor, oneof)
+      assert_equal("payload", oneof.name)
+      assert_equal(0, oneof.index)
+    end
+
     def test_full_name
       child_one = @message.messages[0]
       child_two = @message.messages[1]

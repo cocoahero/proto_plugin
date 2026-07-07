@@ -28,6 +28,18 @@ module ProtoPlugin
       @parent = parent
     end
 
+    # The values defined for this enum.
+    #
+    # @return [Array<EnumValueDescriptor>]
+    #
+    # @see https://github.com/protocolbuffers/protobuf/blob/v28.2/src/google/protobuf/descriptor.proto#L343
+    #   Google::Protobuf::EnumDescriptorProto#value
+    def values
+      @values ||= @descriptor.value.map do |v|
+        EnumValueDescriptor.new(v, self)
+      end
+    end
+
     # The full name of the enum, including parent namespace.
     #
     # @example

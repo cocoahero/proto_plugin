@@ -43,6 +43,18 @@ module ProtoPlugin
       end
     end
 
+    # The oneofs defined on this message.
+    #
+    # @return [Array<OneofDescriptor>]
+    #
+    # @see https://github.com/protocolbuffers/protobuf/blob/v28.2/src/google/protobuf/descriptor.proto#L145
+    #   Google::Protobuf::DescriptorProto#oneof_decl
+    def oneofs
+      @oneofs ||= @descriptor.oneof_decl.each_with_index.map do |o, i|
+        OneofDescriptor.new(o, self, i)
+      end
+    end
+
     # The enums defined as children of this message.
     #
     # @return [Array<EnumDescriptor>]

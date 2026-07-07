@@ -86,6 +86,22 @@ module ProtoPlugin
       refute(@fields["title"].proto3_optional?)
     end
 
+    def test_oneof_membership
+      event = @context.type_by_proto_name(".proto_plugin.fixtures.CommentEvent")
+      fields = event.fields.each_with_object({}) do |field, hash|
+        hash[field.name] = field
+      end
+
+      created = fields["created"]
+      assert(created.oneof?)
+      assert_instance_of(OneofDescriptor, created.oneof)
+      assert_equal("payload", created.oneof.name)
+
+      comment_id = fields["comment_id"]
+      refute(comment_id.oneof?)
+      assert_nil(comment_id.oneof)
+    end
+
     def test_delegates_to_descriptor
       title = @fields["title"]
 
