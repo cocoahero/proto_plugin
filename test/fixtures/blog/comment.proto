@@ -27,6 +27,7 @@ message Comment {
 message CommentEvent {
     uint64 comment_id = 1;
 
+    // Describes what happened to the comment.
     oneof payload {
         string created = 2;
         string edited = 3;

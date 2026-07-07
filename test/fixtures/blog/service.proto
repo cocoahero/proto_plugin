@@ -4,7 +4,9 @@ package proto_plugin.fixtures;
 
 import "article.proto";
 
+// Provides access to articles.
 service ArticlesService {
+    // Fetches a single article by id.
     rpc GetArticle(GetArticleRequest) returns (GetArticleResponse);
 
     rpc GetArticles(GetArticlesRequest) returns (GetArticlesResponse);

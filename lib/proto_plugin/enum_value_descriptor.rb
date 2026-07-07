@@ -11,6 +11,8 @@ module ProtoPlugin
   # @see https://github.com/protocolbuffers/protobuf/blob/v28.2/src/google/protobuf/descriptor.proto#L356
   #   Google::Protobuf::EnumValueDescriptorProto
   class EnumValueDescriptor < SimpleDelegator
+    include Commentable
+
     # @return [Google::Protobuf::EnumValueDescriptorProto]
     attr_reader :descriptor
 
@@ -25,6 +27,13 @@ module ProtoPlugin
       super(descriptor)
       @descriptor = descriptor
       @enum = enum
+    end
+
+    # The file descriptor this enum value belongs to.
+    #
+    # @return [FileDescriptor]
+    def file
+      enum.file
     end
 
     # The full name of the enum value, including parent namespace.

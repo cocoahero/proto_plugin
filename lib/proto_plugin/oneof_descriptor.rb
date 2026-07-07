@@ -11,6 +11,8 @@ module ProtoPlugin
   # @see https://github.com/protocolbuffers/protobuf/blob/v28.2/src/google/protobuf/descriptor.proto#L349
   #   Google::Protobuf::OneofDescriptorProto
   class OneofDescriptor < SimpleDelegator
+    include Commentable
+
     # @return [Google::Protobuf::OneofDescriptorProto]
     attr_reader :descriptor
 
@@ -32,6 +34,13 @@ module ProtoPlugin
       @descriptor = descriptor
       @message = message
       @index = index
+    end
+
+    # The file descriptor this oneof belongs to.
+    #
+    # @return [FileDescriptor]
+    def file
+      message.file
     end
 
     # The fields that are members of this oneof.

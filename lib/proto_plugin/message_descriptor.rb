@@ -11,6 +11,8 @@ module ProtoPlugin
   # @see https://github.com/protocolbuffers/protobuf/blob/v28.2/src/google/protobuf/descriptor.proto#L134
   #   Google::Protobuf::DescriptorProto
   class MessageDescriptor < SimpleDelegator
+    include Commentable
+
     # @return [Google::Protobuf::DescriptorProto]
     attr_reader :descriptor
 
@@ -29,6 +31,13 @@ module ProtoPlugin
       @descriptor = descriptor
       @parent = parent
       @context = context
+    end
+
+    # The file descriptor this message belongs to.
+    #
+    # @return [FileDescriptor]
+    def file
+      parent.file
     end
 
     # The fields defined on this message.

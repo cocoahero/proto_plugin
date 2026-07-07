@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package proto_plugin.fixtures;
 
+// A top-level content category.
 enum Category {
     CATEGORY_UNSPECIFIED = 0;
     CATEGORY_ANNOUNCEMENT = 1;

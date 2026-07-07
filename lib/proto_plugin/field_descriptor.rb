@@ -11,6 +11,8 @@ module ProtoPlugin
   # @see https://github.com/protocolbuffers/protobuf/blob/v28.2/src/google/protobuf/descriptor.proto#L242
   #   Google::Protobuf::FieldDescriptorProto
   class FieldDescriptor < SimpleDelegator
+    include Commentable
+
     # @return [Google::Protobuf::FieldDescriptorProto]
     attr_reader :descriptor
 
@@ -27,6 +29,13 @@ module ProtoPlugin
       @descriptor = descriptor
       @message = message
       @context = context
+    end
+
+    # The file descriptor this field belongs to.
+    #
+    # @return [FileDescriptor]
+    def file
+      message.file
     end
 
     # Resolves the message or enum descriptor referenced by this field.
