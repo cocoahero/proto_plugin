@@ -37,6 +37,8 @@ message Article {
         string avatar = 3;
     }
 
+    // A detached note that documents nothing in particular.
+
     message Metadata {
         repeated string tags = 1;
     }
